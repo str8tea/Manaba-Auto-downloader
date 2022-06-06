@@ -1,0 +1,24 @@
+[
+    {
+        "name": "text1.pdf",
+        "link": "https://",
+        "upload_date": "2022-06-05 17:50:34",
+        "course_name": "講義1",
+        "content_name": "講義資料",
+        "page_title": "講義資料（第1回）",
+        "description": "Nothing",
+        "path": "Unknown",
+        "can_download": false
+    },
+    {
+        "name": "text2.pdf",
+        "link": "https://",
+        "upload_date": "2022-03-31 15:20:23",
+        "course_name": "講義2",
+        "content_name": "授業資料",
+        "page_title": "授業準備と概要",
+        "description": "Nothing",
+        "path": "Unknown",
+        "can_download": false
+    }
+]
