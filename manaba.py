@@ -1,7 +1,6 @@
 # manabaから講義資料を自動でダウンロードするプログラム
 
 from __future__ import annotations
-from contextlib import suppress
 from dataclasses import dataclass, field, asdict
 import json
 import os
@@ -12,24 +11,37 @@ import traceback
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.chrome.webdriver import WebDriver
 
+from go_manaba import go_manaba
 from launch_browser import launch_browser
-from settings import MANABA_URL, MANABA_HOME_URL, USERDATA_DIR, DEFAULT_DOWNLOAD_DIR, SAVE_DIR, FILE_HISTORY_JSON_PATH, COURSE_LIST_JSON_PATH, DOWNLOAD_CONTENT_NAME_LIST_JSON_PATH, IS_UPDATE_COURSE_LIST
+from settings import MANABA_URL, USERDATA_DIR, SAVE_DIR, FILE_HISTORY_JSON_PATH, COURSE_LIST_JSON_PATH, DOWNLOAD_CONTENT_NAME_LIST_JSON_PATH, IS_UPDATE_COURSE_LIST
 
 
 @dataclass(frozen=True, slots=True)
 class Content:
+    """各講義のコンテンツを表すデータクラス
+
+    Note: 
+        self.from_soupから生成されることを想定
+    """
 
     name: str
     link: str
-    update_date: str
+    update_date: str  # ex) 2000-01-01 00:00
 
     @classmethod
     def from_soup(cls, content_card_soup: BeautifulSoup) -> Content:
+        """コンテンツのソースから自身のインスタンスを生成する
+
+        Args:
+            content_card_soup (BeautifulSoup): カード型レイアウトのコンテンツのソース（BeautifulSoupで解析済みのもの）
+
+        Returns:
+            Content: 生成した自身のインスタンス
+        """
 
         # 引数のソースから、コンテンツの各情報を取得
         header = content_card_soup.find("div", class_="contents-card-title")
@@ -43,14 +55,28 @@ class Content:
 
 @dataclass(slots=True)
 class Course:
+    """講義を表すデータクラス
+
+    講義内のコンテンツの取得やコンテンツの検索を行う
+
+    Note:
+        from_soupから生成されることを想定
+    """
+
     name: str
     link: str
-    year: int
-    semester: str
-    day: str
-    period: str
+    year: int  # ex) 2000
+    semester: str  # 前期、後期、通年、Unknownのいずれかが入る
+    day: str  # ex) 月曜（不明の場合はUnknown）
+    period: str  # ex) 1限（不明の場合はUnknown）
     professor: str
-    content_list: list[Content] = field(default_factory=list)
+    content_list: list[Content] = field(
+        default_factory=list)  # この講義内のコンテンツのリスト
+
+    # スケジュールの各項目の正規表現
+    semester_regex = re.compile(r'(前期|後期|通年)')
+    day_regex = re.compile(r'[日月火水木金土]曜')
+    period_regex = re.compile(r'[1-5]限')
 
     def __post_init__(self):
         self.name.removesuffix(" ")  # 末尾の空白文字を削除（ディレクトリ名に使われるため）
@@ -59,7 +85,57 @@ class Course:
         self.content_list = [Content(**content)
                              for content in self.content_list if isinstance(content, dict)]
 
+    @classmethod
+    def from_soup(cls, course_table_raw_soup: BeautifulSoup) -> Course:
+        """引数の講義の一覧表の1行分のソースから自身のインスタンスを生成する
+
+        Args:
+            course_table_raw_soup (BeautifulSoup): manabaのホームページにある講義の一覧表の1行分のソース
+
+        Returns:
+            Course: 講義の各情報（content_listは除く）を引数とした自身のインスタンス
+        """
+
+        course_info = course_table_raw_soup.find_all("td")
+        header = course_info[0].find("span", class_="courselist-title")
+        name = header.get_text(strip=True)
+        link = header.find("a")["href"]
+        full_link = MANABA_URL + link
+        year = course_info[1].get_text()
+        professor = course_info[3].get_text()  # 教授名
+
+        # スケジュールを取り出す（不明の場合はUnkown）
+        # 〇〇  〇〇  〇〇の形式（左から学期、曜日、時限）※空白文字はnbsp
+        schedule = course_info[2].get_text(strip=True)
+
+        # 学期
+        m = re.search(Course.semester_regex, schedule)
+        if m:
+            semester = m.group()
+        else:
+            semester = "Unknown"
+        # 曜日
+        m = re.search(Course.day_regex, schedule)
+        if m:
+            day = m.group()
+        else:
+            day = "Unknown"
+        # 時限
+        m = re.search(Course.period_regex, schedule)
+        if m:
+            period = m.group()
+        else:
+            period = "Unknown"
+
+        # 得られた講義の各情報からコースクラスのインスタンスを生成
+        return cls(name, full_link, year, semester, day, period, professor)
+
     def fetch_content_list(self, driver: WebDriver) -> None:
+        """この講義がもつコンテンツの一覧を講義ページから取得して、メンバ変数content_listに格納する
+
+        Args:
+            driver (WebDriver): ブラウザを操作するドライバー（Selenium）
+        """
 
         # 講義ページに移動
         driver.get(self.link)
@@ -81,49 +157,20 @@ class Course:
         # コンテンツの一覧を格納する
         self.content_list = content_list
 
-    @classmethod
-    def from_soup(cls, course_table_raw_soup: BeautifulSoup) -> Course:
-        course_info = course_table_raw_soup.find_all("td")
-        header = course_info[0].find("span", class_="courselist-title")
-        # full_name = header.get_text()  # 〇〇 【〇〇】【〇〇】〇〇（〇〇）の形式（左から名前、2つの学期などの情報、学科、シラバスコード）
-        # # 上記のうち、名前の部分のみを取り出す（'【'で分ける）
-        # name = full_name.split('【')[0].strip()
-        name = header.get_text(strip=True)
-        link = header.find("a")["href"]
-        full_link = MANABA_URL + link
-        year = course_info[1].get_text()
-        professor = course_info[3].get_text()  # 教授名
-
-        # スケジュールを取り出す（不明の場合はUnkown）
-        # 〇〇  〇〇  〇〇の形式（左から学期、曜日、時限）※空白文字はnbsp
-        schedule = course_info[2].get_text(strip=True)
-        # スケジュールの各項目の正規表現
-        semester_regex = re.compile(r'(前期|後期|通年)')
-        day_regex = re.compile(r'[日月火水木金土]曜')
-        period_regex = re.compile(r'[1-5]限')
-        # 学期
-        m = re.search(semester_regex, schedule)
-        if m:
-            semester = m.group()
-        else:
-            semester = "Unknown"
-        # 曜日
-        m = re.search(day_regex, schedule)
-        if m:
-            day = m.group()
-        else:
-            day = "Unknown"
-        # 時限
-        m = re.search(period_regex, schedule)
-        if m:
-            period = m.group()
-        else:
-            period = "Unknown"
-
-        # 得られたコースの各情報からコースクラスのインスタンスを生成
-        return cls(name, full_link, year, semester, day, period, professor)
-
     def search_content(self, name: str) -> Content:
+        """メンバ変数のコンテンツの一覧から、引数の名前を含むコンテンツを検索する
+
+        Args:
+            name (str): 検索するコンテンツ名
+
+        Note:
+            引数の名前を含むコンテンツが複数ある場合はNoneとする
+            ただし、引数の名前のコンテンツがある場合は、そのコンテンツを返す
+            ex) コンテンツの一覧に'講義資料'と'講義資料前準備'の2つがある場合、'講義資料'で検索したら、'講義資料'のコンテンツを返す
+
+        Returns:
+            Content: 目的のコンテンツ（見つからなかった場合や複数ある場合はNone）
+        """
 
         # 完全一致検索を行う（結果はリスト）
         exact_match_result = list(
@@ -147,35 +194,34 @@ class Course:
 
 
 class CourseList:
+    """コースの一覧を表すクラス
+
+    コースの一覧のJSONの入出力処理、コースの検索を行う
+
+    Attributes:
+        course_list (list[Course]): 
+
+    Note:
+        manabaのホームページまたはJSONファイルから生成することを想定
+    """
 
     __slots__ = ("course_list")
 
     def __init__(self, course_list):
         self.course_list = course_list
 
-    # manabaのホームに移動する関数
-    @staticmethod
-    def go_manaba(driver):
-        # manabaのホームに移動する（ユーザーデータを用いた自動ログインが行われる）
-        driver.get(MANABA_HOME_URL)
-        WebDriverWait(driver, 30).until(
-            EC.visibility_of_all_elements_located)  # ページが読み込まれるまで待機（最大30秒）
-
-        # manabaのページに移動できたかを確認（ワンタイムパスワード打ち込み画面の可能性がある）
-        current_url = driver.current_url
-        if current_url != MANABA_HOME_URL:
-            print("Failed to move manaba. Current URL:", current_url)
-
-        # manabaの時間割をリスト形式にする
-        css_selector = "#container > div.pagebody > div > div.contentbody-left > div.my-infolist.my-infolist-mycourses.my-infolist-mycourses-weekly > ul > li:nth-child(2) > a"
-        with suppress(NoSuchElementException):
-            driver.find_element_by_css_selector(css_selector).click()
-            # すでにリスト形式になっている場合は何もせずに次に進む
-
     @classmethod
-    def from_manaba(cls, driver):
+    def from_manaba(cls, driver: WebDriver) -> CourseList:
+        """manabaのホームページに行き、そのソースから自身のインスタンスを生成する
 
-        cls.go_manaba(driver)
+        Args:
+            driver (Webdriver): 
+
+        Returns:
+            CourseList: 講義の一覧を引数とした自身のインスタンス
+        """
+
+        go_manaba(driver)
 
         # htmlを解析して講義の一覧表を得る
         html = driver.page_source.encode('utf-8')
@@ -184,7 +230,7 @@ class CourseList:
             "table", class_="stdlist courselist")  # 講義の一覧表
         if course_list_soup is None:
             print(f"No courses in {html}")
-            return []
+            return cls([])
         course_raws_soup = course_list_soup.find_all("tr")
         del course_raws_soup[0]  # 表のヘッダー部分である先頭要素を削除
 
@@ -198,7 +244,15 @@ class CourseList:
         return cls(course_list)
 
     @classmethod
-    def from_json(cls, json_filename: str):
+    def from_json(cls, json_filename: str) -> CourseList:
+        """JSONファイルから自身のインスタンスを生成する
+
+        Args:
+            json_filename (str): 講義の一覧が記載されたJSONファイルの名前
+
+        Returns:
+            CourseList: 講義の一覧を引数とした自身のインスタンス
+        """
 
         with open(json_filename, "r", encoding='utf-8') as f:
             course_dict_list = json.load(f)  # JSONデータを辞書形式で読み取る
@@ -209,10 +263,16 @@ class CourseList:
 
         return cls(course_list)
 
-    def to_json(self, json_filename: str):
+    def to_json(self, json_filename: str) -> None:
+        """講義の一覧をJSONファイルに書き込み
+
+        Args:
+            json_filename (str): 書き込み先のJSONファイルの名前（上書きされる）
+        """
+
         if self.course_list == []:
             print("Course list is empty")
-            return None
+            return
 
         # Course型のコースが入るリストを辞書型のコースが入るリストに変換する
         course_dict_list = [asdict(course) for course in self.course_list]
@@ -222,6 +282,19 @@ class CourseList:
             json.dump(course_dict_list, f, ensure_ascii=False)
 
     def search_course(self, name: str) -> Course:
+        """メンバ変数の講義の一覧から、引数の名前を含む講義を検索する（Course.search_contentとアルゴリズムは同じ）
+
+        Args:
+            name (str): 検索する講義名
+
+        Note:
+            引数の名前を含む講義が複数ある場合はNoneとする
+            ただし、引数の名前の講義がある場合は、その講義を返す
+            ex) 講義の一覧に'情報工学'と'情報工学実験'の2つがある場合、'情報工学'で検索したら、'情報工学'の講義を返す
+
+        Returns:
+            Content: 目的の講義（見つからなかった場合や複数ある場合はNone）
+        """
 
         # 完全一致検索を行う（結果はリスト）
         exact_match_result = list(

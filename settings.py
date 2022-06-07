@@ -2,8 +2,7 @@ MANABA_URL = "https://"
 MANABA_HOME_URL = MANABA_URL + "home"
 
 USERDATA_DIR = r".\UserData"  # Chromeのユーザーデータがある場所
-# ファイルがダウンロードされた際にデフォルトで置かれる場所
-DEFAULT_DOWNLOAD_DIR = r"C:\Users\username\downloads"
+
 # ダウンロードしたファイルの保存先のディレクトリ
 SAVE_DIR = r"C:\Users\username\DeskTop"
 FILE_HISTORY_JSON_PATH = r".\fileHistory.json"  # ダウンロードしたファイルの履歴が入るJSONファイルのパス
