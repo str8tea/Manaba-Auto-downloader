@@ -1,7 +1,8 @@
+import os
+
 from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver
 from webdriver_manager.chrome import ChromeDriverManager
-import os
 
 
 def launch_browser(userdata_dir: str, download_dir: str = None) -> WebDriver:
