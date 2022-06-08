@@ -12,6 +12,7 @@ import traceback
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
@@ -90,7 +91,7 @@ class Course:
         """引数の講義の一覧表の1行分のソースから自身のインスタンスを生成する
 
         Args:
-            course_table_raw_soup (BeautifulSoup): manabaのホームページにある講義の一覧表の1行分のソース
+            course_table_raw_soup (BeautifulSoup): manabaのホームページにある講義の一覧表の1行分のソース（BeautifulSoupで解析済みのもの）
 
         Returns:
             Course: 講義の各情報（content_listは除く）を引数とした自身のインスタンス
@@ -163,13 +164,13 @@ class Course:
         Args:
             name (str): 検索するコンテンツ名
 
-        Note:
-            引数の名前を含むコンテンツが複数ある場合はNoneとする
-            ただし、引数の名前のコンテンツがある場合は、そのコンテンツを返す
-            ex) コンテンツの一覧に'講義資料'と'講義資料前準備'の2つがある場合、'講義資料'で検索したら、'講義資料'のコンテンツを返す
-
         Returns:
             Content: 目的のコンテンツ（見つからなかった場合や複数ある場合はNone）
+
+        Note:
+            引数の名前を含むコンテンツが複数ある場合はNoneを返す
+            ただし、引数の名前のコンテンツがある場合は、そのコンテンツを返す
+            ex) コンテンツの一覧に'講義資料'と'講義資料前準備'の2つがある場合、'講義資料'で検索したら、'講義資料'のコンテンツを返す
         """
 
         # 完全一致検索を行う（結果はリスト）
@@ -319,18 +320,38 @@ class CourseList:
 
 @dataclass(slots=True)
 class FileMetadata:
+    """ファイルのメタデータを扱うデータクラス
+
+    ファイルのダウンロード、ファイルのメタデータをJSONファイルに書き込む処理を行う
+
+    Note:
+        manabaのコンテンツページの添付ファイルソースから作成されることを想定
+    """
+
     name: str
     link: str
-    upload_date: str  # フォーマットは2000-01-01 00:00:00
-    course_name: str
-    content_name: str
+    upload_date: str  # ex) 2000-01-01 00:00:00
+    course_name: str  # 不明の場合はUnknown
+    content_name: str  # 不明の場合はUnknown
     page_title: str
-    description: str
+    description: str  # ファイルの説明がない場合はNothing
     path: str = "Not downloaded"
-    can_download: bool = False
+    can_download: bool = False  # ダウンロードに成功した場合はTrue、それ以外の場合はFalse
 
     @classmethod
     def from_soup(cls, file_soup: BeautifulSoup, course_name: str = "Unknown", content_name: str = "Unknown", page_title: str = "Unknown") -> FileMetadata:
+        """引数のソースから自身のインスタンスを生成する
+
+        Args:
+            file_soup (BeautifulSoup): manabaのコンテンツページの添付ファイルソース（BeautifulSoupで解析済みのもの）
+            course_name (str, optional): 講義の名前（デフォルト値はUnknown）
+            content_name (str, optional): コンテンツの名前（デフォルト値はUnknown）
+            page_title (str, optional): ファイルがあるコンテンツページのタイトル（デフォルト値はUnknown）
+
+        Returns:
+            FileMetadata: ファイルのメタデータを引数とした自身のインスタンス
+        """
+
         detail = file_soup.find("div", class_="inlineaf-description").find("a")
         file_link = detail["href"]
         file_full_link = MANABA_URL + file_link
@@ -356,6 +377,14 @@ class FileMetadata:
         return cls(file_name, file_full_link, file_upload_date, course_name, content_name, page_title, description)
 
     def download_by(self, driver: WebDriver) -> None:
+        """引数のdriverを用いて、このファイルのリンクからダウンロードを行う
+
+        Args:
+            driver (WebDriver): ブラウザを操作するドライバー（Selenium）
+
+        Note:
+            ファイルのダウンロードに20秒以上かかる場合は、SAVE_DIRに保存されます
+        """
 
         # ファイルをダウンロードする
         driver.get(self.link)
@@ -376,28 +405,33 @@ class FileMetadata:
             if os.path.isfile(file_path):
                 try:
                     print(
-                        f"succeeded to download '{self.name}' in {self.page_title} of {self.course_name}")
+                        f"Succeeded to download '{self.name}' in {self.page_title} of {self.course_name}")
                     self.can_download = True
                     move(file_path, dest_path)  # dest_pathへファイルを移動する
                 except:
                     print(
-                        f"failed to move '{self.name}' in {self.page_title} of {self.course_name}")
+                        f"Failed to move '{self.name}' in {self.page_title} of {self.course_name}")
                     print(traceback.format_exc())
                     dest_path = file_path
                 else:
                     print(
-                        f"succeeded to move '{self.name}' in {self.page_title} of {self.course_name}")
+                        f"Succeeded to move '{self.name}' in {self.page_title} of {self.course_name}")
                 finally:
                     break
         # ダウンロードしたはずのファイルが見つからなかった場合
         else:
             print(
-                f"failed to download '{self.name}' in {self.page_title} of {self.course_name}")
+                f"Failed to download '{self.name}' in {self.page_title} of {self.course_name}")
             dest_path = "Unknown"
 
         self.path = dest_path  # パスを更新する
 
     def to_json(self, json_filename: str) -> None:
+        """ファイルのメタデータをJSONファイルに書き込む（追記）
+
+        Args:
+            json_filename (str): 書き込み先のJSONファイルの名前
+        """
 
         # 辞書型に変換する
         file_dict = asdict(self)
@@ -409,10 +443,26 @@ class FileMetadata:
 
 @dataclass(frozen=True, slots=True)
 class FileHistory:
+    """ダウンロードしたファイルの履歴（メタデータ）を表すデータクラス
+
+    履歴にファイルのメタデータの追加、履歴をJSONファイルに書き込みを行う
+
+    Note:
+        JSONファイルから読み込んで生成されることを想定
+    """
+
     file_history: list[FileMetadata]
 
     @classmethod
     def from_json(cls, json_filename: str) -> FileHistory:
+        """JSONファイルから自身のインスタンスを生成
+
+        Args:
+            json_filename (str): ファイルの履歴があるJSONファイルの名前
+
+        Returns:
+            FileHistory: ファイルのメタデータのリスト（ファイルの履歴がない場合は空リスト）を引数とする自身のインスタンス
+        """
 
         # JSONファイルがない場合は新規作成する
         if not os.path.isfile(json_filename):
@@ -435,9 +485,19 @@ class FileHistory:
         return cls(file_history)
 
     def add(self, file_metadata: FileMetadata):
+        """引数のファイルのメタデータを履歴の末尾に加える
+
+        Args:
+            file_metadata (FileMetadata): ファイルのメタデータ
+        """
         self.file_history.append(file_metadata)
 
     def to_json(self, json_filename: str) -> None:
+        """ファイルの履歴をJSONファイルに書き込む（上書き）
+
+        Args:
+            json_filename (str): 書き込み先のJSONファイルの名前
+        """
 
         # FileMetadata型のファイルが入るリストを辞書型のファイルが入るリストに変換する
         file_metadata_dict_list = [
@@ -450,18 +510,21 @@ class FileHistory:
 
 @dataclass(frozen=True, slots=True)
 class DownloadContentName:
+    """ダウンロードするコンテンツの名前（講義の名前も含む）を表すデータクラス
+
+    メンバ変数の講義のコンテンツからダウンロードを行う
+    """
+
     course_name: str
     content_name: str
 
-    def download_attachments(self, driver, link: str):
+    def _download_attachments_from_html(self, html: bytes):
+        """引数のhtmlから添付ファイルをダウンロードする
 
-        # コンテンツがあるリンクに移動
-        driver.get(link)
-        WebDriverWait(driver, 30).until(
-            EC.visibility_of_all_elements_located)  # ページが読み込まれるまで待機（最大30秒）
-        sleep(1)
+        Args:
+            html (bytes): htmlのソース
+        """
 
-        html = driver.page_source.encode('utf-8')  # htmlを取得
         soup = BeautifulSoup(html, "html.parser")  # htmlを「html.parser」で解析する
         # course_name = soup.find("a", id="coursename")["title"].strip() # 講義名
         body = soup.find("div", class_="contentbody-left")  # コンテンツの中身
@@ -489,7 +552,17 @@ class DownloadContentName:
         # ダウンロードしたファイルが加わった履歴をJSONファイルに書き込む
         file_history.to_json(FILE_HISTORY_JSON_PATH)
 
-    def download_content(self, driver, course_list: CourseList):
+    def download_content(self, driver: WebDriver, course_list: CourseList) -> None:
+        """コンテンツ内の未読のページにある添付ファイルをダウンロードする
+
+        引数の講義の一覧から、目的のコンテンツのリンクを探す。
+        見つかったらそのリンクに移動し、コンテンツ内の未読のページを探す。
+        見つかったらそのページにある未読の添付ファイルをダウンロードする
+
+        Args:
+            driver (Webdriver): ブラウザを想定するドライバー（Selenium）
+            course_list (CourseList): 講義の一覧
+        """
 
         # ダウンロードするコンテンツをコースリストから探す
         course = course_list.search_course(self.course_name)
@@ -502,15 +575,56 @@ class DownloadContentName:
             print(f"Failed to download from {content.name}")
             return
 
-        self.download_attachments(driver, content.link)
+        # 目的のコンテンツのリンクに移動
+        driver.get(content.link)
+        WebDriverWait(driver, 30).until(
+            EC.visibility_of_all_elements_located)  # ページが読み込まれるまで待機（最大30秒）
+        sleep(1)
+
+        # 未読のページを探す
+        unread_css_selector = \
+            "#container > div.pagebody > div.contents > div > div > div.articlebody > div.contentbody-right > div > table > tbody > tr:nth-child(2) > td > ul > li.GRIunread"
+        unread_items = driver.find_elements(
+            by=By.CSS_SELECTOR, value=unread_css_selector)
+        if unread_items == []:
+            print(f"No unread contents in {content.name} of {course.name}")
+            return
+
+        # 未読の各ページに移動し、添付ファイルをダウンロードする
+        unread_links = [item.find_element_by_tag_name(
+            "a").get_attribute("href") for item in unread_items]
+        for link in unread_links:
+            driver.get(link)
+            WebDriverWait(driver, 30).until(
+                EC.visibility_of_all_elements_located)  # ページが読み込まれるまで待機（最大30秒）
+            sleep(1)
+
+            html = driver.page_source.encode("utf-8")  # 今開いているhtmlを取得
+
+            self._download_attachments_from_html(html)  # 添付ファイルをダウンロードする
 
 
 @dataclass(frozen=True, slots=True)
 class DownloadContentNameList:
+    """ダウンロードするコンテンツの名前の一覧を表すデータクラス
+
+    Note :
+        JSONファイルから読み込んで生成されることを想定
+    """
+
     content_name_list: list[DownloadContentName]
 
     @classmethod
     def from_json(cls, json_filename: str) -> DownloadContentNameList:
+        """JSONファイルから自身のインスタンスを生成する
+
+        Args:
+            json_filename (str): ダウンロードするコンテンツの名前の一覧があるJSONファイルの名前
+
+        Returns:
+            DownloadContentNameList: コンテンツの名前の一覧を引数とする自身のインスタンス
+        """
+
         with open(json_filename, "r", encoding='utf-8') as f:
             content_name_dict_list = json.load(f)  # JSONデータを辞書形式で読み取る
 
@@ -521,6 +635,12 @@ class DownloadContentNameList:
         return cls(content_name_list)
 
     def download_contents(self, driver, course_list: CourseList):
+        """メンバ変数のコンテンツの名前から、コンテンツ内の未読ページにある添付ファイルをダウンロードする
+
+        Args:
+            driver (Webdriver): ブラウザを操作するドライバー（Selenium）
+            course_list (CourseList): 講義の一覧
+        """
         for content_name in self.content_name_list:
             content_name.download_content(driver, course_list)
 
@@ -530,14 +650,17 @@ if __name__ == "__main__":
     # ブラウザ起動
     driver = launch_browser(userdata_dir=USERDATA_DIR, download_dir=SAVE_DIR)
 
+    # 講義の一覧を更新する
     if IS_UPDATE_COURSE_LIST:
         course_list = CourseList.from_manaba(driver)
         course_list.to_json(COURSE_LIST_JSON_PATH)
     else:
         course_list = CourseList.from_json(COURSE_LIST_JSON_PATH)
 
+    # ダウンロードするコンテンツの名前の一覧から該当のコンテンツにある未読の添付ファイルをダウンロードする
     download_content_name_list = DownloadContentNameList.from_json(
         DOWNLOAD_CONTENT_NAME_LIST_JSON_PATH)
     download_content_name_list.download_contents(driver, course_list)
 
+    # ブラウザを終了する
     driver.quit()
