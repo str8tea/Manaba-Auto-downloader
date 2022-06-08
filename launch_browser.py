@@ -29,7 +29,6 @@ def launch_browser(userdata_dir: str, download_dir: str = None) -> WebDriver:
 
     # ダウンロード先のディレクトリの設定
     if download_dir is not None:
-        print(download_dir, "set")
         chrome_options.add_experimental_option(
             "prefs", {
                 "savefile.default_directory": download_dir,
