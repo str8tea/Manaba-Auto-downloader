@@ -1,7 +1,7 @@
 MANABA_URL = "https://"
 MANABA_HOME_URL = MANABA_URL + "home"
 
-USERDATA_DIR = r".\UserData"  # Chromeのユーザーデータがある場所
+USERDATA_DIR = r".\UserData"  # Chromeのユーザーデータのフォルダがある場所
 
 # ダウンロードしたファイルの保存先のディレクトリ
 SAVE_DIR = r"C:\Users\username\DeskTop"
