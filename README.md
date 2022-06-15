@@ -20,6 +20,7 @@ Comming soon...
 必要なライブラリ
 * bs4 0.0.1
 * selenium 4.2.0
+* webdriver-manager 3.5.2
 
 その他
 * manabaのユーザIDとパスワードが保存されているChromeのユーザーデータ
@@ -29,6 +30,7 @@ Comming soon...
 ```bash
 pip install beautifulsoup4
 pip install selenium
+pip install webdriver-manager
 
 ```
  
