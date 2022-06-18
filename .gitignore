@@ -1,0 +1,6 @@
+__pycache__/
+
+UserData/
+courseList.json
+downloadContentNameList.json
+fileHistory.json

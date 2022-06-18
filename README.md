@@ -17,6 +17,8 @@ Comming soon...
  
 # Requirement
 
+Python
+
 必要なライブラリ
 * bs4 0.0.1
 * selenium 4.2.0
@@ -45,7 +47,7 @@ git clone https://github.com/str8tea/manaba.git
 1. 下記のコマンドを実行して、プログラムを実行する
 ```bash
 git clone https://github.com/str8tea/manaba.git
-python manaba.py
+python3 manaba_auto_downloader\apps\apps.py
 ```
  
 # Note
