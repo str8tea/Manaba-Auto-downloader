@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import json
 
 from .course_list import CourseList
-from .download_content_name import DownloadContent
+from .download_content import DownloadContent
 
 
 @dataclass(frozen=True, slots=True)

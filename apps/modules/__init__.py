@@ -6,8 +6,8 @@ sys.path.append(str(Path(__file__).parents[2]))  # noqa: E402
 from .content import Content
 from .course_list import CourseList
 from .course import Course
-from .download_content_name_list import DownloadContentList
-from .download_content_name import DownloadContent
+from .download_content_list import DownloadContentList
+from .download_content import DownloadContent
 from .file_history import FileHistory
 from .file_metadata import FileMetadata
 from .go_manaba import go_manaba
