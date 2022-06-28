@@ -42,8 +42,8 @@ pip install webdriver-manager
 ```bash
 git clone https://github.com/str8tea/manaba.git
 ```
-2. settings.pyを編集して各種設定を行う
-1. downloadContentNameList.jsonに自動でダウンロードしたい講義資料の講義の名前とコンテンツの名前を指定する
+2. settings.jsonを編集して各種設定を行う
+1. download_content_list.jsonに自動でダウンロードしたい講義資料の講義の名前とコンテンツの名前を指定する
 1. 下記のコマンドを実行して、プログラムを実行する
 ```bash
 git clone https://github.com/str8tea/manaba.git
