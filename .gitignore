@@ -1,7 +1,7 @@
 __pycache__/
 
 UserData/
-settings.py
-courseList.json
-downloadContentNameList.json
-fileHistory.json
+settings.json
+course_list.json
+download_content_list.json
+file_history.json
