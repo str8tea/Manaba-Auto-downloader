@@ -37,7 +37,7 @@ pip install webdriver-manager
 ```
  
 # Usage
- 
+
 1. 下記のコマンドを実行して、クローンする
 ```bash
 git clone https://github.com/str8tea/manaba.git
