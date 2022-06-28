@@ -3,35 +3,35 @@ from dataclasses import dataclass
 import json
 
 from .course_list import CourseList
-from .download_content_name import DownloadContentName
+from .download_content_name import DownloadContent
 
 
 @dataclass(frozen=True, slots=True)
-class DownloadContentNameList:
+class DownloadContentList:
     """ダウンロードするコンテンツの名前の一覧を表すデータクラス
 
     Note :
         JSONファイルから読み込んで生成されることを想定
     """
 
-    content_name_list: list[DownloadContentName]
+    content_name_list: list[DownloadContent]
 
     @classmethod
-    def from_json(cls, json_filename: str) -> DownloadContentNameList:
+    def from_json(cls, json_filename: str) -> DownloadContentList:
         """JSONファイルから自身のインスタンスを生成する
 
         Args:
             json_filename (str): ダウンロードするコンテンツの名前の一覧があるJSONファイルの名前
 
         Returns:
-            DownloadContentNameList: コンテンツの名前の一覧を引数とする自身のインスタンス
+            DownloadContentList: コンテンツの名前の一覧を引数とする自身のインスタンス
         """
 
         with open(json_filename, "r", encoding='utf-8') as f:
             content_name_dict_list = json.load(f)  # JSONデータを辞書形式で読み取る
 
-        # 辞書型のダウンロードするコンテンツの名前が入るリストをDownloadContentName型の名前が入るリストに変換する
-        content_name_list = [DownloadContentName(
+        # 辞書型のダウンロードするコンテンツの名前が入るリストをDownloadContent型の名前が入るリストに変換する
+        content_name_list = [DownloadContent(
             **content_name_dict) for content_name_dict in content_name_dict_list]
 
         return cls(content_name_list)

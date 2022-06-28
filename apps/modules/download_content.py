@@ -15,7 +15,7 @@ from settings import FILE_HISTORY_JSON_PATH
 
 
 @dataclass(frozen=True, slots=True)
-class DownloadContentName:
+class DownloadContent:
     """ダウンロードするコンテンツの名前（講義の名前も含む）を表すデータクラス
 
     メンバ変数の講義のコンテンツからダウンロードを行う

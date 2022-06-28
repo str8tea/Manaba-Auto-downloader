@@ -23,7 +23,7 @@ client_path = url_path.rpartition("/")[0] + "/"
 MANABA_CLIENT_URL = urllib.parse.urljoin(base_url, client_path)
 
 # Chromeのユーザーデータのフォルダがある場所
-USERDATA_DIR = data["userdata_dir"]  
+USERDATA_DIR = data["userdata_dir"]
 
 # ダウンロードしたファイルの保存先のディレクトリ
 SAVE_DIR = data["save_dir"]
@@ -32,7 +32,7 @@ FILE_HISTORY_JSON_PATH = os.path.join(CONFIG_DIR, "file_history.json")
 # 講義の一覧が保存されるJSONファイルのパス
 COURSE_LIST_JSON_PATH = os.path.join(CONFIG_DIR, "course_list.json")
 # ダウンロードするコンテンツ名の一覧が入るJSONファイルのパス
-DOWNLOAD_CONTENT_NAME_LIST_JSON_PATH =\
+DOWNLOAD_CONTENT_LIST_JSON_PATH =\
     os.path.join(CONFIG_DIR, "download_content_list.json")
 
 # 講義の一覧（COURSE_LIST_JSON_PATH）を更新するかしないか（True or False）
