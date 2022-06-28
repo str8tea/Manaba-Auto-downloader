@@ -1,7 +1,8 @@
 import os
+import urllib.parse
 
-MANABA_URL = "https://"
-MANABA_HOME_URL = MANABA_URL + "home"
+MANABA_CLIENT_URL = "https://"
+MANABA_HOME_URL = urllib.parse.urljoin(MANABA_CLIENT_URL, "home")
 
 TOP_DIR = os.path.dirname(__file__)
 CONFIG_DIR = os.path.join(TOP_DIR, "config")  # 設定ファイルがあるディレクトリ

@@ -9,7 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from .content import Content
-from settings import MANABA_URL
+from settings import MANABA_CLIENT_URL
 
 
 @dataclass(slots=True)
@@ -59,7 +59,7 @@ class Course:
         header = course_info[0].find("span", class_="courselist-title")
         name = header.get_text(strip=True)
         link = header.find("a")["href"]
-        full_link = MANABA_URL + link
+        full_link = MANABA_CLIENT_URL + link
         year = course_info[1].get_text()
         professor = course_info[3].get_text()  # 教授名
 

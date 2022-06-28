@@ -1,7 +1,7 @@
-import os
+from pathlib import Path
 import sys
-# manaba_auto_downloaderディレクトリをモジュール検索パスに追加（そのディレクトリにあるsettings.pyをインポートするため）
-sys.path.append(os.path.join(os.path.dirname(__file__), "../.."))  # noqa: E402
+# manaba_auto_downloaderディレクトリをモジュール検索パスに追加（そのディレクトリにあるsettings.pyがインポート可能になる）
+sys.path.append(str(Path(__file__).parents[2]))  # noqa: E402
 
 from .content import Content
 from .course_list import CourseList

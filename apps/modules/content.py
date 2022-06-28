@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from bs4 import BeautifulSoup
 
-from settings import MANABA_URL
+from settings import MANABA_CLIENT_URL
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,7 +33,7 @@ class Content:
         header = content_card_soup.find("div", class_="contents-card-title")
         name = header.find("a").get_text(strip=True)
         link = header.find("a")["href"]
-        full_link = MANABA_URL + link
+        full_link = MANABA_CLIENT_URL + link
         update_date = header.find("span").get_text()
 
         return cls(name, full_link, update_date)

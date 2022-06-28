@@ -1,0 +1,6 @@
+{
+    "manaba_home_url": "https://",
+    "userdata_dir": "./UserData",
+    "save_dir": "C:/path/in/save/downloaded/file",
+    "is_update_course_list": true
+}

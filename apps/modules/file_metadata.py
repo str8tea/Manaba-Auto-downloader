@@ -10,7 +10,7 @@ import traceback
 from bs4 import BeautifulSoup
 from selenium.webdriver.chrome.webdriver import WebDriver
 
-from settings import MANABA_URL, SAVE_DIR
+from settings import MANABA_CLIENT_URL, SAVE_DIR
 
 
 @dataclass(slots=True)
@@ -49,8 +49,8 @@ class FileMetadata:
 
         detail = file_soup.find("div", class_="inlineaf-description").find("a")
         file_link = detail["href"]
-        file_full_link = MANABA_URL + file_link
-        detail_text = detail.get_text(strip=True)
+        file_full_link = MANABA_CLIENT_URL + file_link
+        detail_text = detail.get_text("<br>")  # <br>タグが消えないようにする
 
         # ファイルの説明がある（2行ある）場合は、1行目が説明、2行目がファイルのヘッダー
         if "<br>" in detail_text:
@@ -98,11 +98,13 @@ class FileMetadata:
             sleep(2)
             # ダウンロードに成功した場合
             if os.path.isfile(file_path):
+                print(
+                    f"Succeeded to download '{self.name}' in {self.page_title} of {self.course_name}")
+                self.can_download = True
+
+                # dest_pathへファイルを移動する
                 try:
-                    print(
-                        f"Succeeded to download '{self.name}' in {self.page_title} of {self.course_name}")
-                    self.can_download = True
-                    move(file_path, dest_path)  # dest_pathへファイルを移動する
+                    move(file_path, dest_path)
                 except:
                     print(
                         f"Failed to move '{self.name}' in {self.page_title} of {self.course_name}")
