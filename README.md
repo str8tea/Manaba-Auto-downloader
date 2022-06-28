@@ -17,7 +17,7 @@ Comming soon...
  
 # Requirement
 
-Python
+* Python 3.10.2
 
 必要なライブラリ
 * bs4 0.0.1
@@ -40,13 +40,12 @@ pip install webdriver-manager
 
 1. 下記のコマンドを実行して、クローンする
 ```bash
-git clone https://github.com/str8tea/manaba.git
+git clone https://github.com/str8tea/manaba_auto_downloader.git
 ```
 2. settings.jsonを編集して各種設定を行う
 1. download_content_list.jsonに自動でダウンロードしたい講義資料の講義の名前とコンテンツの名前を指定する
 1. 下記のコマンドを実行して、プログラムを実行する
 ```bash
-git clone https://github.com/str8tea/manaba.git
 python3 manaba_auto_downloader\apps\apps.py
 ```
  
