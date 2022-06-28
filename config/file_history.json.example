@@ -2,13 +2,13 @@
     {
         "name": "text1.pdf",
         "link": "https://",
-        "upload_date": "2022-06-05 17:50:34",
+        "upload_date": "2022-01-01 12:00:30",
         "course_name": "講義1",
         "content_name": "講義資料",
         "page_title": "講義資料（第1回）",
-        "description": "Nothing",
+        "description": "ガイダンス資料",
         "path": "Unknown",
-        "can_download": false
+        "can_download": true
     },
     {
         "name": "text2.pdf",
