@@ -31,9 +31,9 @@ if __name__ == "__main__":
         course_list = modules.CourseList.from_json(COURSE_LIST_JSON_PATH)
 
     # ダウンロードするコンテンツの名前の一覧から該当のコンテンツにある未読の添付ファイルをダウンロードする
-    download_content_name_list = modules.DownloadContentList.from_json(
+    download_content_list = modules.DownloadContentList.from_json(
         DOWNLOAD_CONTENT_LIST_JSON_PATH)
-    download_content_name_list.download_contents(driver, course_list)
+    download_content_list.download_contents(driver, course_list)
 
     # ブラウザを終了する
     driver.quit()
