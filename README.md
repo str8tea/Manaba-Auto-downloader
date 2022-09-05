@@ -9,7 +9,7 @@ manabaというクラウド型教育支援システムから講義資料を自�
  
 # Features
  
-このプログラムを実行すると、講義資料を自動でダウンロードしてくれるため、講義前にmanabaにアクセスして講義資料をいちいちダウンロードする手間が省けます。
+このプログラムを実行すると、講義資料を自動でダウンロードしてくれるため、講義前にmanabaにアクセスして講義資料をダウンロードする手間が省けます。
  
 # Requirement
 言語
@@ -38,7 +38,7 @@ pip install webdriver-manager
 ```bash
 git clone https://github.com/str8tea/manaba_auto_downloader.git
 ```
-2. settings.jsonを編集して各種設定を行う
+2. settings.jsonを編集して各種設定を行う（settings.json.exampleを参照）
 1. download_content_list.jsonに自動でダウンロードしたい講義資料の講義の名前とコンテンツの名前を指定する
 1. 下記のコマンドを実行して、プログラムを実行する
 ```bash
