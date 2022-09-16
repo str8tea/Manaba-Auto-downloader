@@ -68,20 +68,17 @@ class Course:
         schedule = course_info[2].get_text(strip=True)
 
         # 学期
-        m = re.search(Course.semester_regex, schedule)
-        if m:
+        if m := re.search(Course.semester_regex, schedule):
             semester = m.group()
         else:
             semester = "Unknown"
         # 曜日
-        m = re.search(Course.day_regex, schedule)
-        if m:
+        if m := re.search(Course.day_regex, schedule):
             day = m.group()
         else:
             day = "Unknown"
         # 時限
-        m = re.search(Course.period_regex, schedule)
-        if m:
+        if m := re.search(Course.period_regex, schedule):
             period = m.group()
         else:
             period = "Unknown"
