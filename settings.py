@@ -10,10 +10,10 @@ SETTINGS_PATH = os.path.join(CONFIG_DIR, "settings.json")
 
 # 設定ファイル(json)から各要素を読み取る
 with open(SETTINGS_PATH, "r", encoding='utf-8') as f:
-    data = json.load(f)
+    settings = json.load(f)
 
 # manabaのホームページのURL
-MANABA_HOME_URL = data["manaba_home_url"]
+MANABA_HOME_URL = settings["manaba_home_url"]
 
 # MANABA_HOME_URLからmanabaのクライアントURLを作成する
 manaba_home_url_tuples = urllib.parse.urlsplit(MANABA_HOME_URL)
@@ -23,10 +23,10 @@ client_path = url_path.rpartition("/")[0] + "/"
 MANABA_CLIENT_URL = urllib.parse.urljoin(base_url, client_path)
 
 # Chromeのユーザーデータのフォルダがある場所
-USERDATA_DIR = data["userdata_dir"]
+USERDATA_DIR = settings["userdata_dir"]
 
 # ダウンロードしたファイルの保存先のディレクトリ
-SAVE_DIR = data["save_dir"]
+SAVE_DIR = settings["save_dir"]
 # ダウンロードしたファイルの履歴が入るJSONファイルのパス
 FILE_HISTORY_JSON_PATH = os.path.join(CONFIG_DIR, "file_history.json")
 # 講義の一覧が保存されるJSONファイルのパス
@@ -36,4 +36,4 @@ DOWNLOAD_CONTENT_LIST_JSON_PATH =\
     os.path.join(CONFIG_DIR, "download_content_list.json")
 
 # 講義の一覧（COURSE_LIST_JSON_PATH）を更新するかしないか（True or False）
-IS_UPDATE_COURSE_LIST = True
+IS_UPDATE_COURSE_LIST = settings["is_update_course_list"]
