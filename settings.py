@@ -1,7 +1,7 @@
 import json
 import os
 import urllib.parse
-
+from pathlib import Path
 
 TOP_DIR = os.path.dirname(__file__)
 CONFIG_DIR = os.path.join(TOP_DIR, "config")  # 設定ファイルがあるディレクトリ
@@ -26,7 +26,7 @@ MANABA_CLIENT_URL = urllib.parse.urljoin(base_url, client_path)
 USERDATA_DIR = settings["userdata_dir"]
 
 # ダウンロードしたファイルの保存先のディレクトリ
-SAVE_DIR = settings["save_dir"]
+SAVE_DIR = Path(settings["save_dir"])
 # ダウンロードしたファイルの履歴が入るJSONファイルのパス
 FILE_HISTORY_JSON_PATH = os.path.join(CONFIG_DIR, "file_history.json")
 # 講義の一覧が保存されるJSONファイルのパス

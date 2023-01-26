@@ -59,20 +59,22 @@ class FileMetadata:
             description = "Nothing"
             file_header = detail_text
 
-        # headerの形式は「ファイル名 - アップロード日時」なので正規表現で取り出す
+        # headerの形式は「ファイル名」または「ファイル名 - アップロード日時」なので、アップロード日時の有無を正規表現で確かめる
         header_regex = re.compile(
             r'(.+\.[a-z]+) - (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})')
         m = re.match(header_regex, file_header)
         if m:
             file_name, file_upload_date = m.groups()
         else:
-            file_name = "Unknown"
+            file_name = file_header
             file_upload_date = "Unknown"
 
         return cls(file_name, file_full_link, file_upload_date, course_name, content_name, page_title, description)
 
     def download_by(self, driver: WebDriver) -> None:
         """引数のdriverを用いて、このファイルのリンクからダウンロードを行う
+
+        SAVE_DIR直下に講義名のディレクトリを作成し、そこにダウンロードしたファイルを保存する
 
         Args:
             driver (WebDriver): ブラウザを操作するドライバー（Selenium）
@@ -89,7 +91,7 @@ class FileMetadata:
         course_dir = os.path.join(SAVE_DIR, self.course_name)
         os.makedirs(course_dir, exist_ok=True)  # ディレクトリが既にある場合は何もしない
 
-        # ダウンロードしたファイルの移動先の設定
+        # ダウンロードしたファイルの移動先のパス
         dest_path = os.path.join(course_dir, self.name)
 
         # ダウンロードしたファイルを講義名のディレクトリに移動させる

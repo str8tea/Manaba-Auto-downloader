@@ -25,13 +25,14 @@ def launch_browser(userdata_dir: str, download_dir: str = None) -> WebDriver:
     # ユーザーデータの設定
     os.makedirs(userdata_dir, exist_ok=True)  # ユーザーデータが存在しない場合は新たに作成する
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument("--user-data-dir=" + userdata_dir)
+    chrome_options.add_argument(f"--user-data-dir={userdata_dir}")
 
-    # ダウンロード先のディレクトリの設定
-    if download_dir is not None:
+    # ダウンロード先のディレクトリの設定（参照：https://www.microfocus.com/documentation/silk-test/195/ja/silk4net-195-help-ja/GUID-781614F2-54A0-4BE3-95B9-C282121A9B43.html）
+    if download_dir:
         chrome_options.add_experimental_option(
             "prefs", {
-                "savefile.default_directory": download_dir,
+                "profile.default_content_setting_values.automatic_downloads": 1,
+                "download.default_directory": download_dir,
                 "download.prompt_for_download": False,
                 "download.directory_upgrade": True})
 

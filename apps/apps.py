@@ -18,7 +18,7 @@ if __name__ == "__main__":
 
     # ブラウザ起動
     driver = modules.launch_browser(
-        userdata_dir=USERDATA_DIR, download_dir=SAVE_DIR)
+        userdata_dir=USERDATA_DIR, download_dir=str(SAVE_DIR))
 
     # 講義の一覧を更新する
     if IS_UPDATE_COURSE_LIST:
