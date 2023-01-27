@@ -139,7 +139,7 @@ class Course:
             filter(lambda content: name in content.name, self.content_list))
         match len(partial_match_result):
             case 0:
-                print(f"'{name}' is not found")
+                print(f"Contents name '{name}' is not found")
                 return None
             case 1:
                 return partial_match_result[0]

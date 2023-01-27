@@ -81,12 +81,10 @@ class DownloadContent:
         # ダウンロードするコンテンツをコースリストから探す
         course = course_list.search_course(self.course_name)
         if course is None:
-            print(f"Not found '{self.course_name}' course")
             return
 
         content = course.search_content(self.content_name)
         if content is None:
-            print(f"Not found '{self.content_name}' course")
             return
 
         # 目的のコンテンツのリンクに移動

@@ -123,7 +123,7 @@ class CourseList:
             filter(lambda course: name in course.name, self.course_list))
         match len(partial_match_result):
             case 0:
-                print(f"'{name}' is not found")
+                print(f"Course name '{name}' is not found")
                 return None
             case 1:
                 return partial_match_result[0]
