@@ -21,7 +21,7 @@ manabaというクラウド型教育支援システムから講義資料を自�
 * webdriver-manager 3.5.2
 
 その他
-* manabaのユーザIDとパスワードが保存されているChromeのユーザーデータ（manabaに自動ログインできるユーザーデータ）
+* manabaのユーザIDとパスワードが保存されているChromeのユーザーデータ  （manabaに自動ログインできるユーザーデータ）
 
 # Installation
  
