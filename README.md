@@ -42,6 +42,7 @@ git clone https://github.com/str8tea/manaba_auto_downloader.git
 2. manabaのログイン情報が保存されているChromeのユーザーデータを用意する
 1. settings.jsonを編集して各種設定を行う（参照：settings.json.example）
 1. download_content_list.jsonに自動でダウンロードしたい講義資料の講義の名前とコンテンツの名前を指定する（参照：download_content_list.json.example）
+1. manaba_auto_downloaderディレクトリに移動する
 1. 下記のコマンドを実行して、プログラムを実行する
 ```bash
 python3 manaba_auto_downloader\apps\apps.py
