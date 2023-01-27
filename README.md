@@ -21,7 +21,7 @@ manabaというクラウド型教育支援システムから講義資料を自�
 * webdriver-manager 3.5.2
 
 その他
-* manabaのユーザIDとパスワードが保存されているChromeのユーザーデータ
+* manabaのユーザIDとパスワードが保存されているChromeのユーザーデータ（manabaに自動ログインできるユーザーデータ）
 
 # Installation
  
@@ -38,7 +38,8 @@ pip install webdriver-manager
 ```bash
 git clone https://github.com/str8tea/manaba_auto_downloader.git
 ```
-2. settings.jsonを編集して各種設定を行う（参照：settings.json.example）
+2. manabaのログイン情報が保存されているChromeのユーザーデータを用意する
+1. settings.jsonを編集して各種設定を行う（参照：settings.json.example）
 1. download_content_list.jsonに自動でダウンロードしたい講義資料の講義の名前とコンテンツの名前を指定する（参照：download_content_list.json.example）
 1. 下記のコマンドを実行して、プログラムを実行する
 ```bash
