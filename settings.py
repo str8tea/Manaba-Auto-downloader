@@ -4,7 +4,8 @@ import urllib.parse
 from pathlib import Path
 
 TOP_DIR = os.path.dirname(__file__)
-CONFIG_DIR = os.path.join(TOP_DIR, "config")  # 設定ファイルがあるディレクトリ
+CONFIG_DIR = os.path.join(TOP_DIR, "config")
+OUTPUT_DIR = os.path.join(TOP_DIR, "output")
 
 SETTINGS_PATH = os.path.join(CONFIG_DIR, "settings.json")
 
@@ -28,9 +29,9 @@ USERDATA_DIR = settings["userdata_dir"]
 # ダウンロードしたファイルの保存先のディレクトリ
 SAVE_DIR = Path(settings["save_dir"])
 # ダウンロードしたファイルの履歴が入るJSONファイルのパス
-FILE_HISTORY_JSON_PATH = os.path.join(CONFIG_DIR, "file_history.json")
+FILE_HISTORY_JSON_PATH = os.path.join(OUTPUT_DIR, "file_history.json")
 # 講義の一覧が保存されるJSONファイルのパス
-COURSE_LIST_JSON_PATH = os.path.join(CONFIG_DIR, "course_list.json")
+COURSE_LIST_JSON_PATH = os.path.join(OUTPUT_DIR, "course_list.json")
 # ダウンロードするコンテンツ名の一覧が入るJSONファイルのパス
 DOWNLOAD_CONTENT_LIST_JSON_PATH =\
     os.path.join(CONFIG_DIR, "download_content_list.json")
