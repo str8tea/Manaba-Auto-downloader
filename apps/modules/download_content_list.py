@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 import json
+from pathlib import Path
 
 from .course_list import CourseList
 from .download_content import DownloadContent
@@ -17,17 +18,17 @@ class DownloadContentList:
     content_name_list: list[DownloadContent]
 
     @classmethod
-    def from_json(cls, json_filename: str) -> DownloadContentList:
+    def from_json(cls, json_path: Path) -> DownloadContentList:
         """JSONファイルから自身のインスタンスを生成する
 
         Args:
-            json_filename (str): ダウンロードするコンテンツの名前の一覧があるJSONファイルの名前
+            json_path (Path): ダウンロードするコンテンツの名前の一覧があるJSONファイルパス
 
         Returns:
             DownloadContentList: コンテンツの名前の一覧を引数とする自身のインスタンス
         """
 
-        with open(json_filename, "r", encoding='utf-8') as f:
+        with open(json_path, "r", encoding='utf-8') as f:
             content_name_dict_list = json.load(f)  # JSONデータを辞書形式で読み取る
 
         # 辞書型のダウンロードするコンテンツの名前が入るリストをDownloadContent型の名前が入るリストに変換する

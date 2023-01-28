@@ -12,13 +12,20 @@ from settings import USERDATA_DIR, SAVE_DIR, COURSE_LIST_JSON_PATH, DOWNLOAD_CON
 
 if __name__ == "__main__":
 
+    # パスの存在チェック
+    dir_list = [USERDATA_DIR, SAVE_DIR]
+    for dir in dir_list:
+        if not dir.is_dir():
+            print(f"The directory '{dir}' is not found.")
+            sys.exit()
+
     # 必要なファイルの作成
-    Path(COURSE_LIST_JSON_PATH).touch(exist_ok=True)
-    Path(FILE_HISTORY_JSON_PATH).touch(exist_ok=True)
+    COURSE_LIST_JSON_PATH.touch(exist_ok=True)
+    FILE_HISTORY_JSON_PATH.touch(exist_ok=True)
 
     # ブラウザ起動
     driver = modules.launch_browser(
-        userdata_dir=USERDATA_DIR, download_dir=str(SAVE_DIR))
+        userdata_dir=USERDATA_DIR, download_dir=SAVE_DIR)
 
     # 講義の一覧を更新する
     if IS_UPDATE_COURSE_LIST:

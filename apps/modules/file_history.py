@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, asdict
 import json
-import os
+from pathlib import Path
 
 from .file_metadata import FileMetadata
 
@@ -19,28 +19,25 @@ class FileHistory:
     file_history: list[FileMetadata]
 
     @classmethod
-    def from_json(cls, json_filename: str) -> FileHistory:
+    def from_json(cls, json_path: Path) -> FileHistory:
         """JSONファイルから自身のインスタンスを生成
 
         Args:
-            json_filename (str): ファイルの履歴があるJSONファイルの名前
+            json_path (Path): ファイルの履歴があるJSONファイルパス
 
         Returns:
             FileHistory: ファイルのメタデータのリスト（ファイルの履歴がない場合は空リスト）を引数とする自身のインスタンス
         """
 
         # JSONファイルがない場合は新規作成する
-        if not os.path.isfile(json_filename):
-            with open(json_filename, "w") as f:
-                pass
-            return cls([])
+        json_path.touch(exist_ok=True)
 
         # JSONファイルの中身が空の場合
-        if os.path.getsize(json_filename) == 0:
+        if json_path.stat().st_size == 0:
             return cls([])
 
         # JSONファイルからダウンロードしたファイルの履歴を辞書形式で読み取る
-        with open(json_filename, "r", encoding='utf-8') as f:
+        with open(json_path, "r", encoding='utf-8') as f:
             file_metadata_dict_list = json.load(f)
 
         # 辞書型のファイルが入るリストをFileMetadata型のファイルが入るリストに変換する
@@ -57,17 +54,17 @@ class FileHistory:
         """
         self.file_history.append(file_metadata)
 
-    def to_json(self, json_filename: str) -> None:
+    def to_json(self, json_path: Path) -> None:
         """ファイルの履歴をJSONファイルに書き込む（上書き）
 
         Args:
-            json_filename (str): 書き込み先のJSONファイルの名前
+            json_path (Path): 書き込み先のJSONファイルパス
         """
 
         # FileMetadata型のファイルが入るリストを辞書型のファイルが入るリストに変換する
         file_metadata_dict_list = [
             asdict(file_metadata) for file_metadata in self.file_history]
 
-        with open(json_filename, "w", encoding="utf-8") as f:
+        with open(json_path, "w", encoding="utf-8") as f:
             # JSON形式でファイルに書き込む
             json.dump(file_metadata_dict_list, f, ensure_ascii=False)

@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass, asdict
 import json
-import os
+from pathlib import Path
 import re
 from shutil import move
 from time import sleep
@@ -85,21 +85,21 @@ class FileMetadata:
 
         # ファイルをダウンロードする
         driver.get(self.link)
-        file_path = os.path.join(SAVE_DIR, self.name)
+        file_path = SAVE_DIR / self.name
 
         # 講義名のディレクトリを作成する
-        course_dir = os.path.join(SAVE_DIR, self.course_name)
-        os.makedirs(course_dir, exist_ok=True)  # ディレクトリが既にある場合は何もしない
+        course_dir = SAVE_DIR / self.course_name
+        course_dir.mkdir(exist_ok=True)
 
         # ダウンロードしたファイルの移動先のパス
-        dest_path = os.path.join(course_dir, self.name)
+        dest_path = course_dir / self.name
 
         # ダウンロードしたファイルを講義名のディレクトリに移動させる
         for _ in range(10):
             # ダウンロードが完了していない可能性があるので、2秒間隔で10回ダウンロードしたファイルの移動を試みる
             sleep(2)
             # ダウンロードに成功した場合
-            if os.path.isfile(file_path):
+            if file_path.is_file():
                 print(
                     f"Succeeded to download '{self.name}' in {self.page_title} of {self.course_name}")
                 self.can_download = True
@@ -123,18 +123,18 @@ class FileMetadata:
                 f"Failed to download '{self.name}' in {self.page_title} of {self.course_name}")
             dest_path = "Unknown"
 
-        self.path = dest_path  # パスを更新する
+        self.path = str(dest_path)  # パスを更新する
 
-    def to_json(self, json_filename: str) -> None:
+    def to_json(self, json_path: Path) -> None:
         """ファイルのメタデータをJSONファイルに書き込む（追記）
 
         Args:
-            json_filename (str): 書き込み先のJSONファイルの名前
+            json_path (Path): 書き込み先のJSONファイルパス
         """
 
         # 辞書型に変換する
         file_dict = asdict(self)
 
-        with open(json_filename, "a", encoding="utf-8") as f:
+        with open(json_path, "a", encoding="utf-8") as f:
             # JSON形式でファイルに追記する
             json.dump(file_dict, f, ensure_ascii=False)

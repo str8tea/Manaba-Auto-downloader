@@ -1,13 +1,12 @@
 import json
-import os
 import urllib.parse
 from pathlib import Path
 
-TOP_DIR = os.path.dirname(__file__)
-CONFIG_DIR = os.path.join(TOP_DIR, "config")
-OUTPUT_DIR = os.path.join(TOP_DIR, "output")
+TOP_DIR = Path(__file__).resolve().parent
+CONFIG_DIR = TOP_DIR / "config"
+OUTPUT_DIR = TOP_DIR / "output"
 
-SETTINGS_PATH = os.path.join(CONFIG_DIR, "settings.json")
+SETTINGS_PATH = CONFIG_DIR / "settings.json"
 
 # 設定ファイル(json)から各要素を読み取る
 with open(SETTINGS_PATH, "r", encoding='utf-8') as f:
@@ -24,17 +23,20 @@ client_path = url_path.rpartition("/")[0] + "/"
 MANABA_CLIENT_URL = urllib.parse.urljoin(base_url, client_path)
 
 # Chromeのユーザーデータのフォルダがある場所
-USERDATA_DIR = settings["userdata_dir"]
+if settings["is_absolute_userdata_path"]:
+    USERDATA_DIR = Path(settings["userdata_dir"])
+else:
+    USERDATA_DIR = TOP_DIR / Path(settings["userdata_dir"])
+# print(USERDATA_DIR)
 
 # ダウンロードしたファイルの保存先のディレクトリ
 SAVE_DIR = Path(settings["save_dir"])
 # ダウンロードしたファイルの履歴が入るJSONファイルのパス
-FILE_HISTORY_JSON_PATH = os.path.join(OUTPUT_DIR, "file_history.json")
+FILE_HISTORY_JSON_PATH = OUTPUT_DIR / "file_history.json"
 # 講義の一覧が保存されるJSONファイルのパス
-COURSE_LIST_JSON_PATH = os.path.join(OUTPUT_DIR, "course_list.json")
+COURSE_LIST_JSON_PATH = OUTPUT_DIR / "course_list.json"
 # ダウンロードするコンテンツ名の一覧が入るJSONファイルのパス
-DOWNLOAD_CONTENT_LIST_JSON_PATH =\
-    os.path.join(CONFIG_DIR, "download_content_list.json")
+DOWNLOAD_CONTENT_LIST_JSON_PATH = CONFIG_DIR / "download_content_list.json"
 
 # 講義の一覧（COURSE_LIST_JSON_PATH）を更新するかしないか（True or False）
 IS_UPDATE_COURSE_LIST = settings["is_update_course_list"]

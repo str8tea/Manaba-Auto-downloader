@@ -1,6 +1,7 @@
 {
-    "manaba_home_url": "https://",
-    "userdata_dir": "./UserData",
-    "save_dir": "C:/path/in/save/downloaded/file",
-    "is_update_course_list": true
+    "manaba_home_url": "https://manaba.univercity.ac.jp/ct/home",
+    "save_dir": "C:/path/in/save/downloaded/file", // このディレクトリの直下に、講義名のディレクトリが作成され、その中にファイル（講義資料）が保存される
+    "userdata_dir": "./UserData", // Chromeのユーザーデータのパス
+    "is_absolute_userdata_path": false, // falseの場合は、manaba_auto_downloaderディレクトリから見た相対パス
+    "is_update_course_list": true   // trueだとcourse_list.jsonが更新される
 }

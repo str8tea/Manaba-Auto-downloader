@@ -1,6 +1,7 @@
 from __future__ import annotations
 from dataclasses import asdict
 import json
+from pathlib import Path
 
 from bs4 import BeautifulSoup
 from selenium.webdriver.chrome.webdriver import WebDriver
@@ -60,17 +61,17 @@ class CourseList:
         return cls(course_list)
 
     @classmethod
-    def from_json(cls, json_filename: str) -> CourseList:
+    def from_json(cls, json_path: Path) -> CourseList:
         """JSONファイルから自身のインスタンスを生成する
 
         Args:
-            json_filename (str): 講義の一覧が記載されたJSONファイルの名前
+            json_path (Path): 講義の一覧が記載されたJSONファイルパス
 
         Returns:
             CourseList: 講義の一覧を引数とした自身のインスタンス
         """
 
-        with open(json_filename, "r", encoding='utf-8') as f:
+        with open(json_path, "r", encoding='utf-8') as f:
             course_dict_list = json.load(f)  # JSONデータを辞書形式で読み取る
 
         # 辞書型のコースが入るリストをCourse型のコースが入るリストに変換する
@@ -79,11 +80,11 @@ class CourseList:
 
         return cls(course_list)
 
-    def to_json(self, json_filename: str) -> None:
+    def to_json(self, json_path: Path) -> None:
         """講義の一覧をJSONファイルに書き込み
 
         Args:
-            json_filename (str): 書き込み先のJSONファイルの名前（上書きされる）
+            json_path (Path): 書き込み先のJSONファイルパス（上書きされる）
         """
 
         if self.course_list == []:
@@ -93,7 +94,7 @@ class CourseList:
         # Course型のコースが入るリストを辞書型のコースが入るリストに変換する
         course_dict_list = [asdict(course) for course in self.course_list]
 
-        with open(json_filename, "w", encoding="utf-8") as f:
+        with open(json_path, "w", encoding="utf-8") as f:
             # JSON形式でファイルに書き込む
             json.dump(course_dict_list, f, ensure_ascii=False)
 

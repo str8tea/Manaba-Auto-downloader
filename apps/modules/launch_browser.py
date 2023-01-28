@@ -1,16 +1,16 @@
-import os
+from pathlib import Path
 
 from selenium import webdriver
 from selenium.webdriver.chrome.webdriver import WebDriver
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-def launch_browser(userdata_dir: str, download_dir: str = None) -> WebDriver:
+def launch_browser(userdata_dir: Path, download_dir: Path = None) -> WebDriver:
     """ユーザーデータをもつChromeを起動する
 
     Args:
-        userdata_dir(str): Chromeのユーザーデータディレクトリがある場所
-        download_dir(str, optional): ダウンロード先のディレクトリ（デフォルト値はNone）
+        userdata_dir(Path): Chromeのユーザーデータディレクトリがある場所
+        download_dir(Path, optional): ダウンロード先のディレクトリ（デフォルト値はNone）
 
     Note:
         download_dirのパスの区切り文字に'/'は無効、'\\'かr文字列で指定すること('\\'の場合は、ルートの区切りのみ'\')
@@ -23,7 +23,6 @@ def launch_browser(userdata_dir: str, download_dir: str = None) -> WebDriver:
     """
 
     # ユーザーデータの設定
-    os.makedirs(userdata_dir, exist_ok=True)  # ユーザーデータが存在しない場合は新たに作成する
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument(f"--user-data-dir={userdata_dir}")
 
@@ -32,7 +31,7 @@ def launch_browser(userdata_dir: str, download_dir: str = None) -> WebDriver:
         chrome_options.add_experimental_option(
             "prefs", {
                 "profile.default_content_setting_values.automatic_downloads": 1,
-                "download.default_directory": download_dir,
+                "download.default_directory": str(download_dir),
                 "download.prompt_for_download": False,
                 "download.directory_upgrade": True})
 

@@ -95,7 +95,7 @@ class DownloadContent:
 
         # 未読のページを探す
         unread_css_selector = \
-            "#container > div.pagebody > div.contents > div > div > div.articlebody > div.contentbody-right > div > table > tbody > tr:nth-child(2) > td > ul > li.GRIunread"
+            "#container > div.pagebody > div.contents > div > div > div.articlebody > div.contentbody-right > div > table > tbody > tr:nth-child(2) > td > ul > li.GRIread"
         unread_items = driver.find_elements(
             by=By.CSS_SELECTOR, value=unread_css_selector)
         if unread_items == []:
