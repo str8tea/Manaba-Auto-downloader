@@ -47,12 +47,12 @@ class FileHistory:
         return cls(file_history)
 
     def add(self, file_metadata: FileMetadata):
-        """引数のファイルのメタデータを履歴の末尾に加える
+        """引数のファイルのメタデータを履歴の先頭に加える
 
         Args:
             file_metadata (FileMetadata): ファイルのメタデータ
         """
-        self.file_history.append(file_metadata)
+        self.file_history.insert(0, file_metadata)
 
     def to_json(self, json_path: Path) -> None:
         """ファイルの履歴をJSONファイルに書き込む（上書き）
