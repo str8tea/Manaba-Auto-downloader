@@ -83,35 +83,41 @@ class FileMetadata:
             ファイルのダウンロードに20秒以上かかる場合は、SAVE_DIRに保存されます
         """
 
-        # ファイルをダウンロードする
-        driver.get(self.link)
-        file_path = SAVE_DIR / self.name
-
         # 講義名のディレクトリを作成する
         course_dir = SAVE_DIR / self.course_name
         course_dir.mkdir(exist_ok=True)
 
-        # ダウンロードしたファイルの移動先のパス
-        dest_path = course_dir / self.name
+        # ファイルをダウンロードする
+        driver.get(self.link)
 
         # ダウンロードしたファイルを講義名のディレクトリに移動させる
         for _ in range(10):
             # ダウンロードが完了していない可能性があるので、2秒間隔で10回ダウンロードしたファイルの移動を試みる
             sleep(2)
+
+            # ダウンロードする予定のファイルの拡張子をスクレイピングで取得できなかった場合、ファイル名（拡張子なし）で探す
+            if len(Path(self.name).suffix) == 0:
+                for path in SAVE_DIR.iterdir():
+                    if path.is_file and path.stem == self.name:
+                        self.name = path.name  # 見つかった場合は、ファイル名を更新する
+
+            src_path = SAVE_DIR / self.name  # ダウンロードしたファイルのパス
+            dest_path = course_dir / self.name  # ダウンロードしたファイルの移動先のパス
+
             # ダウンロードに成功した場合
-            if file_path.is_file():
+            if src_path.is_file():
                 print(
                     f"Succeeded to download '{self.name}' in {self.page_title} of {self.course_name}")
                 self.can_download = True
 
                 # dest_pathへファイルを移動する
                 try:
-                    move(file_path, dest_path)
+                    move(src_path, dest_path)
                 except:
                     print(
                         f"Failed to move '{self.name}' in {self.page_title} of {self.course_name}")
                     print(traceback.format_exc())
-                    dest_path = file_path
+                    dest_path = src_path
                 else:
                     print(
                         f"Succeeded to move '{self.name}' in {self.page_title} of {self.course_name}")
