@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from selenium.webdriver.chrome.webdriver import WebDriver
 
 from .course import Course
-from .go_manaba import go_manaba
+from common import utils
 
 
 class CourseList:
@@ -38,7 +38,7 @@ class CourseList:
             CourseList: 講義の一覧を引数とした自身のインスタンス
         """
 
-        go_manaba(driver)
+        utils.go_manaba(driver)
 
         # htmlを解析して講義の一覧表を得る
         html = driver.page_source.encode('utf-8')

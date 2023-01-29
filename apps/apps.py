@@ -8,6 +8,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parents[1]))  # noqa: E402
 
 import modules
+from common import utils
 from settings import USERDATA_DIR, SAVE_DIR, COURSE_LIST_JSON_PATH, DOWNLOAD_CONTENT_LIST_JSON_PATH, FILE_HISTORY_JSON_PATH, IS_UPDATE_COURSE_LIST
 
 if __name__ == "__main__":
@@ -24,7 +25,7 @@ if __name__ == "__main__":
     FILE_HISTORY_JSON_PATH.touch(exist_ok=True)
 
     # ブラウザ起動
-    driver = modules.launch_browser(
+    driver = utils.launch_browser(
         userdata_dir=USERDATA_DIR, download_dir=SAVE_DIR)
 
     # 講義の一覧を更新する
