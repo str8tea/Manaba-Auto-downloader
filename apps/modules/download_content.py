@@ -97,13 +97,13 @@ class DownloadContent:
         unread_css_selector = \
             "#container > div.pagebody > div.contents > div > div > div.articlebody > div.contentbody-right > div > table > tbody > tr:nth-child(2) > td > ul > li.GRIunread"
         unread_items = driver.find_elements(
-            by=By.CSS_SELECTOR, value=unread_css_selector)
+            By.CSS_SELECTOR, unread_css_selector)
         if unread_items == []:
             print(f"No unread contents in {content.name} of {course.name}")
             return
 
         # 未読の各ページに移動し、添付ファイルをダウンロードする
-        unread_links = [item.find_element_by_tag_name(
-            "a").get_attribute("href") for item in unread_items]
+        unread_links = [item.find_element(
+            By.TAG_NAME, "a").get_attribute("href") for item in unread_items]
         for link in unread_links:
             self._download_attachments(driver, link)  # 添付ファイルをダウンロードする

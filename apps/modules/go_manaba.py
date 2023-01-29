@@ -1,6 +1,7 @@
 from contextlib import suppress
 
 from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -28,5 +29,5 @@ def go_manaba(driver: WebDriver):
     # manabaの時間割をリスト形式にする
     css_selector = "#container > div.pagebody > div > div.contentbody-left > div.my-infolist.my-infolist-mycourses.my-infolist-mycourses-weekly > ul > li:nth-child(2) > a"
     with suppress(NoSuchElementException):
-        driver.find_element_by_css_selector(css_selector).click()
+        driver.find_element(By.CSS_SELECTOR, css_selector).click()
         # すでにリスト形式になっている場合は何もせずに次に進む
