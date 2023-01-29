@@ -16,12 +16,12 @@ manabaというクラウド型教育支援システムから講義資料を自�
 * Python 3.10.2
 
 必要なライブラリ
-* bs4 0.0.1
+* beautifulsoup4 4.10.0
 * selenium 4.2.0
 * webdriver-manager 3.5.2
 
 その他
-* manabaのユーザIDとパスワードが保存されているChromeのユーザーデータ  
+* manabaのログイン情報（ユーザIDやパスワードなど）が保存されているChromeのユーザーデータ  
 （manabaに自動ログインできるユーザーデータ）
 
 # Installation
@@ -30,7 +30,11 @@ manabaというクラウド型教育支援システムから講義資料を自�
 pip install beautifulsoup4
 pip install selenium
 pip install webdriver-manager
+```
 
+もしくは、クローンした後
+```bash
+pip install -r requirements.txt
 ```
  
 # Usage
@@ -45,11 +49,11 @@ git clone https://github.com/str8tea/manaba_auto_downloader.git
 1. manaba_auto_downloaderディレクトリに移動する
 1. 下記のコマンドを実行して、プログラムを実行する
 ```bash
-python3 manaba_auto_downloader\apps\apps.py
+python manaba_auto_downloader\apps\apps.py
 ```
  
 # Note
 
-このプログラムの実行には、manabaのユーザIDとパスワードが保存されているChromeのユーザーデータが必要です。 また、作者が通っている大学のmanabaでしか動作は保証されません。
+このプログラムの実行には、manabaのログイン情報が保存されているChromeのユーザーデータが必要です。 また、作者が通っている大学のmanabaでしか動作は保証されません。
 
  
