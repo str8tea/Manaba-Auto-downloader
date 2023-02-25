@@ -46,14 +46,6 @@ class FileHistory:
 
         return cls(file_history)
 
-    def add(self, file_metadata: FileMetadata):
-        """引数のファイルのメタデータを履歴の先頭に加える
-
-        Args:
-            file_metadata (FileMetadata): ファイルのメタデータ
-        """
-        self.file_history.insert(0, file_metadata)
-
     def to_json(self, json_path: Path) -> None:
         """ファイルの履歴をJSONファイルに書き込む（上書き）
 
@@ -62,9 +54,17 @@ class FileHistory:
         """
 
         # FileMetadata型のファイルが入るリストを辞書型のファイルが入るリストに変換する
-        file_metadata_dict_list = [
-            asdict(file_metadata) for file_metadata in self.file_history]
+        file_metadata_dict_list = [asdict(file_metadata)
+                                   for file_metadata in self.file_history]
 
         with open(json_path, "w", encoding="utf-8") as f:
             # JSON形式でファイルに書き込む
             json.dump(file_metadata_dict_list, f, ensure_ascii=False)
+
+    def add(self, file_metadata: FileMetadata):
+        """引数のファイルのメタデータを履歴の先頭に加える
+
+        Args:
+            file_metadata (FileMetadata): ファイルのメタデータ
+        """
+        self.file_history.insert(0, file_metadata)
