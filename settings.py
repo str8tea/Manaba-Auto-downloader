@@ -27,7 +27,6 @@ if settings["is_absolute_userdata_path"]:
     USERDATA_DIR = Path(settings["userdata_dir"])
 else:
     USERDATA_DIR = TOP_DIR / Path(settings["userdata_dir"])
-# print(USERDATA_DIR)
 
 # ダウンロードしたファイルの保存先のディレクトリ
 SAVE_DIR = Path(settings["save_dir"])
